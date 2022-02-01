@@ -1,4 +1,5 @@
 package android.bignerdranch.geoquiz
+import android.content.Intent
 import android.os.Bundle
 
 import android.util.Log
@@ -16,12 +17,15 @@ private const val KEY_INDEX = "index"
 
 private const val TAG = "MainActivity"
 
+private const val REQUEST_CODE_CHEAT = 0
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var trueButton: Button
     private lateinit var falseButton: Button
     private lateinit var nextButton: ImageButton
     private lateinit var prevButton: ImageButton
+    private lateinit var cheatButton: Button
     private lateinit var questionTextView: TextView
     private var numQuestionsAnswered: Double = 0.0
     private var numCorrectAnswers: Double = 0.0
@@ -43,6 +47,8 @@ class MainActivity : AppCompatActivity() {
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
         prevButton = findViewById(R.id.prev_button)
+        cheatButton = findViewById(R.id.cheat_button)
+
         questionTextView = findViewById(R.id.question_text_view)
 
         trueButton.setOnClickListener { view: View ->
@@ -65,6 +71,13 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
             trueButton.isClickable = true
             falseButton.isClickable = true
+        }
+
+        cheatButton.setOnClickListener {
+            // Start CheatActivity
+            val answerIsTrue = quizViewModel.currentQuestionAnswer
+            val intent = CheatActivity.newIntent(this, answerIsTrue)
+            startActivityForResult(intent, REQUEST_CODE_CHEAT)
         }
 
         questionTextView.setOnClickListener { // Clicking on the text view to change question Challenge
@@ -118,12 +131,10 @@ class MainActivity : AppCompatActivity() {
         falseButton.isClickable = false
         numQuestionsAnswered += 1
         val correctAnswer = quizViewModel.currentQuestionAnswer
-        var messageResId = ""
-        if (userAnswer == correctAnswer) {
-            messageResId = "Correct!"
-            numCorrectAnswers += 1
-        } else {
-            messageResId = "Incorrect!"
+        val messageResId = when {
+            quizViewModel.isCheater -> R.string.judgement_toast
+            userAnswer == correctAnswer -> R.string.correct_toast
+            else -> R.string.incorrect_toast
         }
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
 
@@ -135,6 +146,13 @@ class MainActivity : AppCompatActivity() {
                 numCorrectAnswers = 0.0
                 numQuestionsAnswered = 0.0
             }
+        }
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            quizViewModel.isCheater = data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
         }
     }
 }
