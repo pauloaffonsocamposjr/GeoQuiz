@@ -1,13 +1,7 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center_vertical|center_horizontal">
 
     <TextView
             android:id="@+id/question_text_view"
@@ -26,13 +20,15 @@
                 android:id="@+id/true_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/true_button" />
+                android:text="@string/true_button"
+                style="?android:attr/buttonBarButtonStyle" />
 
             <Button
                 android:id="@+id/false_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/false_button" />
+                android:text="@string/false_button"
+                style="?android:attr/buttonBarButtonStyle" />
 
         </LinearLayout>
 
@@ -53,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|left"
-                android:contentDescription="Previous button"
+                android:contentDescription="@string/prev_button"
                 android:src="@drawable/arrow_left" />
 
             <ImageButton
@@ -61,8 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|right"
-                android:contentDescription="Next button"
+                android:contentDescription="@string/next_button"
                 android:src="@drawable/arrow_right" />
         </LinearLayout>
-    </LinearLayout>
-</FrameLayout>
+</merge>

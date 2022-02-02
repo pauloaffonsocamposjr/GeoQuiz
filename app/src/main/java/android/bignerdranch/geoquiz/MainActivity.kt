@@ -1,5 +1,7 @@
 package android.bignerdranch.geoquiz
+import android.app.ActivityOptions
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 
 import android.util.Log
@@ -61,7 +63,8 @@ class MainActivity : AppCompatActivity() {
 
         nextButton.setOnClickListener {
             quizViewModel.moveToNext()
-            updateQuestion()
+            quizViewModel.isCheater = false
+            updateQuestion() // cheater-detection toast is made based on the question
             trueButton.isClickable = true
             falseButton.isClickable = true
         }
@@ -73,11 +76,17 @@ class MainActivity : AppCompatActivity() {
             falseButton.isClickable = true
         }
 
-        cheatButton.setOnClickListener {
+        cheatButton.setOnClickListener { view ->
             // Start CheatActivity
             val answerIsTrue = quizViewModel.currentQuestionAnswer
             val intent = CheatActivity.newIntent(this, answerIsTrue)
-            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val options = ActivityOptions.makeClipRevealAnimation(view, 0, 0, view.width, view.height)
+                startActivityForResult(intent, REQUEST_CODE_CHEAT, options.toBundle())
+            }
+            else {
+                startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            }
         }
 
         questionTextView.setOnClickListener { // Clicking on the text view to change question Challenge
@@ -123,6 +132,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateQuestion() {
         val questionTextResId = quizViewModel.currentQuestionText
+
         questionTextView.setText(questionTextResId)
     }
 
@@ -154,5 +164,9 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_CHEAT) {
             quizViewModel.isCheater = data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
         }
+    }
+
+    public fun getAndroidVersion(): String {
+        return Build.VERSION.RELEASE
     }
 }
